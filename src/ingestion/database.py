@@ -4,7 +4,7 @@ from src.models.intelligence_report import Base
 
 DATABASE_URL = "postgresql://user:password@localhost:5432/signal_db"
 engine  = create_engine(DATABASE_URL)
-Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 def init_db():
     Base.metadata.create_all(engine)

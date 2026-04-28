@@ -1,10 +1,9 @@
 ﻿import feedparser
-import urllib.request
-import ssl
 import httpx
-from database import Session, init_db
-from models import IntelligenceReport
-# Adding a User-Agent is crucial so servers don't block the request
+from database import SessionLocal, init_db, engine
+from src.ingestion.database import SessionLocal
+from src.models.intelligence_report import IntelligenceReport
+
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
 }
@@ -16,7 +15,36 @@ FEEDS = {
     "Defence Viewpoints" : "https://www.defenceviewpoints.co.uk/rss"
 }
 
-def test_feeds():
+def save_to_db(entries, source_name):
+    session = SessionLocal()
+    new_count = 0
+
+    for entry in entries:
+        link = entry.get('link')
+
+        linkExists = session.query(IntelligenceReport).filter_by(link=link).first()
+        if linkExists:
+            print(f"Report with link {link} already exists. Skipping.")
+            continue
+        else:
+            report = IntelligenceReport(
+                title = entry.get('title'),
+                link = link,
+                source = source_name,
+                content = entry.get('summary', '')
+            )
+
+            session.add(report)
+            new_count += 1
+
+    session.commit()
+    session.close()
+    if new_count > 0:
+        print(f"Added {new_count} new reports from {source_name}.")
+
+def run_scraper():
+    init_db()
+
     with httpx.Client(headers=HEADERS, follow_redirects=True, verify=False) as client:
         # context = ssl._create_unverified_context()
         for name, url in FEEDS.items():
@@ -41,9 +69,11 @@ def test_feeds():
                     date = entry.get('updated') or entry.get('published') or 'N/A'
                     print(f"[Date]: {date}")
 
+                save_to_db(feed.entries, name)
+
             except Exception as e:
                 print(f"An error occurred while scraping {name}: {e}")
 
 
 if __name__ == "__main__":
-    test_feeds()
+    run_scraper()
