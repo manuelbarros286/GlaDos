@@ -5,6 +5,7 @@ from typing import List
 from src.api.schemas import ReportSchema, PaginatedReportSchema
 from src.models.intelligence_report import IntelligenceReport
 from src.ingestion.database import SessionLocal
+from sqlalchemy import func
 
 router = APIRouter()
 
@@ -34,7 +35,6 @@ async def get_reports(skip: int = 0, limit: int = 20, db: Session = Depends(get_
 
 @router.get("/stats")
 async def get_stats(db: Session = Depends(get_db)):
-    from sqlalchemy import func
     stats = db.query(IntelligenceReport.source,
                      func.count(IntelligenceReport.id)
                      ).group_by(IntelligenceReport.source).all()
@@ -43,8 +43,11 @@ async def get_stats(db: Session = Depends(get_db)):
 
 @router.get("/search", response_model=List[ReportSchema])
 async def search_reports(query: str, db: Session = Depends(get_db)):
+    search_query = func.plainto_tsquery('english', query)
+    search_vector = func.to_tsvector('english', IntelligenceReport.title + " " + IntelligenceReport.content)
     results = db.query(IntelligenceReport).filter(
-        IntelligenceReport.title.ilike(f"%{query}%")
+        search_vector.op('@@')(search_query)
+    ).order_by(func.ts_rank(search_vector, search_query).desc()
     ).limit(20).all()
 
     if not results:
