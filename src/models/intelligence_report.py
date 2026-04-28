@@ -12,7 +12,7 @@ class IntelligenceReport(Base):
     content = Column(Text, nullable=True)
     link = Column(String(1000), unique=True, nullable=False)
     source = Column(String(100), nullable=False)
-    published_date = Column(DateTime, default=datetime.utcnow)
+    published_date = Column(DateTime, default=datetime.now(), nullable=False)
 
     # unique links
     __table_args__ = (UniqueConstraint('link', name='_link_uc'),)
