@@ -1,6 +1,6 @@
 ﻿from pydantic import BaseModel
 from datetime import datetime
-from typing import Optional
+from typing import List
 
 class ReportSchema(BaseModel):
     id: int
@@ -10,4 +10,13 @@ class ReportSchema(BaseModel):
     published_date: datetime
 
     class Config:
-        from_attributes = True # Tells Pydantic to work with SQLAlchemy objects
+        from_attributes = True # Work with SQLAlchemy objects
+
+class PaginatedReportSchema(BaseModel):
+    total: int
+    page: int
+    limit: int
+    results: List[ReportSchema]
+
+    class Config:
+        from_attributes = True

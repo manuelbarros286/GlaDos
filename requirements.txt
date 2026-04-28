@@ -10,3 +10,6 @@ numpy
 httpx
 feedparser
 python-dotenv
+
+scalar-fastapi
+pydantic

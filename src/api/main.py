@@ -1,7 +1,7 @@
 ﻿from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from src.api.routes import router
-
+from scalar_fastapi import get_scalar_api_reference
 app = FastAPI(title="GlaDos API", version="0.1.0")
 
 app.add_middleware(
@@ -13,6 +13,9 @@ app.add_middleware(
 
 app.include_router(router)
 
-@app.get("/")
-async def health_check():
-    return {"status": "online", "message": "GlaDos is operational!"}
+@app.get("/scalar", include_in_schema=False)
+async def scalar_html():
+    return get_scalar_api_reference(
+        openapi_url=app.openapi_url,
+        title=app.title,
+    )
