@@ -8,12 +8,22 @@ app = FastAPI(
     description="Strategic OSINT Analysis & Trend Detection"
 )
 
+origins= [
+    "http://localhost:5173",
+    "http://127.0.0.1:8080",
+    "http://glados-ui.vercel.app",
+]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # allow any for now
+    allow_origins=[origins], # allow only our frontend
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+from mangum import Mangum
+
+handler = Mangum(app) # AWS Lambda call
 
 import time
 from fastapi import Request
