@@ -7,15 +7,15 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
-      Handler: src.api.main.handler  # Points to your Mangum handler
-      Runtime: python3.11
+      Handler: src.api.main.handler  #Mangum handler
+      Runtime: python3.14
       Architectures:
         - x86_64
       MemorySize: 512
       Timeout: 30
       Environment:
         Variables:
-          DATABASE_URL: !Ref DatabaseUrl # We'll pass this in securely
+          DATABASE_URL: !Ref DatabaseUrl
       Events:
         GlaDosApi:
           Type: Api
@@ -26,4 +26,4 @@ Resources:
 Parameters:
   DatabaseUrl:
     Type: String
-    Description: Connection string for Supabase
+    Description: Connection string for supabase
