@@ -9,7 +9,7 @@ pandas
 numpy
 httpx
 feedparser
-python-dotenv
+#python-dotenv
 
 scalar-fastapi
 pydantic

@@ -1,11 +1,16 @@
 ﻿FROM public.ecr.aws/lambda/python:3.11
 
-# Copy requirements and install
+RUN yum -y install gcc gcc-c++
+
 COPY requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir \
+    --trusted-host pypi.org \
+    --trusted-host pypi.python.org \
+    --trusted-host files.pythonhosted.org \
+    --prefer-binary \
+    -r requirements.txt
 
-# Copy all source code
-COPY src/ ${LAMBDA_TASK_ROOT}/src/
+COPY src/ ${LAMBDA_TASK_ROOT}/
 
-# Set the handler to the Mangum object we created earlier
-CMD ["src.api.main.handler"]
+CMD ["api.v1.main.handler"]

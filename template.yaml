@@ -6,22 +6,23 @@ Resources:
   GlaDosFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: .
-      Handler: src.api.main.handler  #Mangum handler
-      Runtime: python3.14
+      PackageType: Image  # Change this from CodeUri/Runtime
       Architectures:
         - x86_64
-      MemorySize: 512
-      Timeout: 30
+      MemorySize: 3008
+      Timeout: 60
       Environment:
         Variables:
           DATABASE_URL: !Ref DatabaseUrl
       Events:
         GlaDosApi:
-          Type: Api
+          Type: HttpApi # Better performance and easier CORS than 'Api'
           Properties:
             Path: /{proxy+}
             Method: any
+    Metadata:
+      DockerContext: .
+      Dockerfile: Dockerfile
 
 Parameters:
   DatabaseUrl:
