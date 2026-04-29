@@ -1,2 +1,8 @@
 .env
 qdrant_storage/
+samconfig.toml
+.aws-sam/
+__pycache__/
+*.pyc
+.venv/
+.idea/
