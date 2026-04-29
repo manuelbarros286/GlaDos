@@ -13,3 +13,4 @@ python-dotenv
 
 scalar-fastapi
 pydantic
+mangum
